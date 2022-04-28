@@ -1,13 +1,67 @@
+import 'dart:ui';
 import 'package:flutter/material.dart';
 import 'dart:math' as math;
 import 'package:flutter/services.dart';
-class NewTransaction extends StatelessWidget {
+class NewTransaction extends StatefulWidget {
 
   final Function addTx;
-  final titleController = TextEditingController();
-  final amountController = TextEditingController();
 
   NewTransaction(this.addTx);
+
+  @override
+  State<NewTransaction> createState() => _NewTransactionState();
+}
+
+class _NewTransactionState extends State<NewTransaction> {
+  final titleController = TextEditingController();
+
+  final amountController = TextEditingController();
+
+  FocusNode amountFocusNode = FocusNode();
+
+  void submitDada(){
+    final enteredTitle = titleController.text;
+    double enteredAmount = 0.00;
+
+    try{
+      enteredAmount = double.parse(amountController.text);
+    }catch(_){
+
+    }
+    if(enteredTitle.isEmpty || enteredAmount <= 0){
+      ///Reminder: try add a Snackbar message for invalid inputs
+
+        return;
+    }
+
+      widget.addTx(
+        enteredTitle,
+        enteredAmount,
+      );
+    Navigator.of(context).pop();
+    ScaffoldMessenger.of(context).showSnackBar(SnackBar(
+        backgroundColor: Theme.of(context).primaryColorDark,
+        duration: Duration(seconds: 3),
+         content: Text('Item added!'),
+    ));
+
+  }
+
+  bool functieVerificareValiditate(){
+    final enteredTitle = titleController.text;
+    double enteredAmount = 0.00;
+
+    try{
+      enteredAmount = double.parse(amountController.text);
+    }catch(_){
+
+    }
+    if(enteredTitle.isNotEmpty && enteredAmount > 0){
+      return true;
+    }
+
+    return false;
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -20,25 +74,36 @@ class NewTransaction extends StatelessWidget {
           children: <Widget>[
             TextField(
               decoration: InputDecoration(labelText: 'Title'),
+              onSubmitted: (_) => amountFocusNode.requestFocus(),
+              onChanged: (_){
+                setState(() {
+
+                });
+              },
               controller: titleController,
             ),
             TextField(
               decoration: InputDecoration(labelText: 'Amount'),
+              focusNode: amountFocusNode,
               controller: amountController,
-              keyboardType: TextInputType.numberWithOptions(),
+              keyboardType: const TextInputType.numberWithOptions(decimal: true, signed: false),
+
+              onSubmitted: (_) => submitDada(),
+              onChanged: (_){
+                setState(() {
+
+                });
+              },
               inputFormatters: [
                 FilteringTextInputFormatter.deny(RegExp("[^0-9.-]")), DecimalTextInputFormatter(decimalRange: 2)]
 
             ),
             ElevatedButton(
-              style: ElevatedButton.styleFrom(primary: Colors.purple),
+              style: ElevatedButton.styleFrom(
+                  primary: (functieVerificareValiditate())?Theme.of(context).primaryColorDark : Theme.of(context).primaryColorLight),
               child: Text('Add Transaction'),
 
-              onPressed: () {
-                addTx(
-                    titleController.text,
-                    double.parse(amountController.text));
-              },
+              onPressed: () => submitDada(),
             ),
           ],
         ),
