@@ -2,6 +2,8 @@ import 'dart:ui';
 import 'package:flutter/material.dart';
 import 'dart:math' as math;
 import 'package:flutter/services.dart';
+import 'package:intl/intl.dart';
+
 class NewTransaction extends StatefulWidget {
 
   final Function addTx;
@@ -13,22 +15,25 @@ class NewTransaction extends StatefulWidget {
 }
 
 class _NewTransactionState extends State<NewTransaction> {
-  final titleController = TextEditingController();
+  final _titleController = TextEditingController();
+  final _amountController = TextEditingController();
 
-  final amountController = TextEditingController();
 
   FocusNode amountFocusNode = FocusNode();
 
-  void submitDada(){
-    final enteredTitle = titleController.text;
+  bool dateWasSelectedFlag = false;
+  DateTime? _selectedDate;
+
+  void _submitDada(){
+    final enteredTitle = _titleController.text;
     double enteredAmount = 0.00;
 
     try{
-      enteredAmount = double.parse(amountController.text);
+      enteredAmount = double.parse(_amountController.text);
     }catch(_){
 
     }
-    if(enteredTitle.isEmpty || enteredAmount <= 0){
+    if(enteredTitle.isEmpty || enteredAmount <= 0 || _selectedDate == null){
       ///Reminder: try add a Snackbar message for invalid inputs
 
         return;
@@ -37,6 +42,7 @@ class _NewTransactionState extends State<NewTransaction> {
       widget.addTx(
         enteredTitle,
         enteredAmount,
+        _selectedDate,
       );
     Navigator.of(context).pop();
     ScaffoldMessenger.of(context).showSnackBar(SnackBar(
@@ -47,21 +53,39 @@ class _NewTransactionState extends State<NewTransaction> {
 
   }
 
+  Future<void> _presentDatePicker()async{
+    DateTime? res = await showDatePicker(
+      context: context,
+      initialDate: DateTime.now(),
+      firstDate: DateTime(2000),
+      lastDate: DateTime(2050),
+    );
+
+    if(res == null){
+      return;
+    }
+    setState(() {
+      _selectedDate = res;
+      dateWasSelectedFlag = true;
+    });
+  }
+
   bool functieVerificareValiditate(){
-    final enteredTitle = titleController.text;
+    final enteredTitle = _titleController.text;
     double enteredAmount = 0.00;
 
     try{
-      enteredAmount = double.parse(amountController.text);
+      enteredAmount = double.parse(_amountController.text);
     }catch(_){
 
     }
-    if(enteredTitle.isNotEmpty && enteredAmount > 0){
+    if(enteredTitle.isNotEmpty && enteredAmount > 0 && dateWasSelectedFlag == true){
       return true;
     }
-
     return false;
   }
+
+
 
   @override
   Widget build(BuildContext context) {
@@ -80,15 +104,15 @@ class _NewTransactionState extends State<NewTransaction> {
 
                 });
               },
-              controller: titleController,
+              controller: _titleController,
             ),
             TextField(
               decoration: InputDecoration(labelText: 'Amount'),
               focusNode: amountFocusNode,
-              controller: amountController,
+              controller: _amountController,
               keyboardType: const TextInputType.numberWithOptions(decimal: true, signed: false),
 
-              onSubmitted: (_) => submitDada(),
+              onSubmitted: (_) => _submitDada(),
               onChanged: (_){
                 setState(() {
 
@@ -96,15 +120,67 @@ class _NewTransactionState extends State<NewTransaction> {
               },
               inputFormatters: [
                 FilteringTextInputFormatter.deny(RegExp("[^0-9.-]")), DecimalTextInputFormatter(decimalRange: 2)]
-
             ),
-            ElevatedButton(
-              style: ElevatedButton.styleFrom(
-                  primary: (functieVerificareValiditate())?Theme.of(context).primaryColorDark : Theme.of(context).primaryColorLight),
-              child: Text('Add Transaction'),
+            Container(
+              padding: EdgeInsets.only(top: 10, bottom: 10),
 
-              onPressed: () => submitDada(),
+              child: Row(
+                children: <Widget>[
+                  Padding(
+                    padding: EdgeInsets.fromLTRB(0, 10, 0, 5),
+                    child: Text(_selectedDate == null
+                        ? 'No date chosen!'
+                        : 'Picked date: ${DateFormat("dd MMM yyyy").format(_selectedDate!)}',
+                      style: TextStyle(
+                        fontWeight: FontWeight.bold,
+                        color: Colors.grey,
+                      ),
+                    ),
+                  ),
+                ],
+              ),
             ),
+            Row(
+              children: [
+                ElevatedButton(
+                  child: const Text('Choose a date',
+                    style: TextStyle(
+                        fontWeight: FontWeight.bold),
+                  ),
+                  onPressed: () {
+                    _presentDatePicker();
+                    setState(() {
+
+                    });
+                    ///Cod alegere data cu return type pe .pop({"flag" : date != null, "retVal" : date})
+                    // var res;
+                    // try{
+                    //   dateWasSelectedFlag = res["flag"];
+                    // }
+                    // catch(_){
+                    //   dateWasSelectedFlag = false;
+                    // }
+                    //
+                    // if(dateWasSelectedFlag){
+                    //   ///Move date of "retVal" in class variable
+                    // }
+                  },
+                ),
+                const Expanded(child: SizedBox(
+
+                ),
+
+                ),
+                ElevatedButton(
+                  style: ElevatedButton.styleFrom(
+                      primary: (functieVerificareValiditate())?Theme.of(context).primaryColorDark : Theme.of(context).primaryColorLight),
+                  child: Text('Add Transaction'),
+
+                  onPressed: () => _submitDada(),
+                ),
+              ],
+            ),
+
           ],
         ),
       ),

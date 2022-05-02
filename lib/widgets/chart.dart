@@ -4,10 +4,29 @@ import 'package:intl/intl.dart';
 
 import 'chart_bar.dart';
 
-class Chart extends StatelessWidget {
-  final List<Transaction> recentTransactions;
+class Chart extends StatefulWidget {
+  List<Transaction> recentTransactions;
 
-  Chart(this.recentTransactions);
+  Chart(this.recentTransactions, {required Key key}) : super(key: key);
+
+  @override
+  State<Chart> createState() => ChartState();
+}
+
+class ChartState extends State<Chart> {
+
+  late List<Transaction> recentTransactions;
+
+  @override
+  void initState() {
+    recentTransactions = widget.recentTransactions;
+  }
+
+  void updateRecentTransaction(List<Transaction> auxTrans){
+    setState((){
+      recentTransactions = auxTrans;
+    });
+  }
 
   List<Map<String, dynamic>> get groupedTrnsactionValues{
     return List.generate(7, (index) {
@@ -35,6 +54,9 @@ class Chart extends StatelessWidget {
       return sum + item['amount'];
     });
   }
+
+
+
   @override
   Widget build(BuildContext context) {
     print(groupedTrnsactionValues);

@@ -58,7 +58,10 @@ class MyHomePage extends StatefulWidget {
 
 class _MyHomePageState extends State<MyHomePage> {
 
-  final List<Transaction> _userTransactions = [
+
+  GlobalKey<ChartState> globalKeyChart = GlobalKey<ChartState>();
+
+  List<Transaction> _userTransactions = [
     /*Transaction(
         id: 't1', title: 'New Shoes', amount: 69.99, date: DateTime.now()),
     Transaction(
@@ -79,11 +82,11 @@ class _MyHomePageState extends State<MyHomePage> {
     }).toList();
   }
 
-  void _addNewTransaction(String txTitle, double txAmount){
+  void _addNewTransaction(String txTitle, double txAmount, DateTime chosenDate){
     final newTx = Transaction(
       title: txTitle,
       amount: txAmount,
-      date: DateTime.now(),
+      date: chosenDate,
       id: DateTime.now().toString(),
     );
 
@@ -119,8 +122,16 @@ class _MyHomePageState extends State<MyHomePage> {
               //mainAxisAlignment: MainAxisAlignment.start,
               crossAxisAlignment: CrossAxisAlignment.stretch,
               children: <Widget>[
-                Chart(_userTransactions),
-                TransactionList(_userTransactions)
+                Chart(_userTransactions, key: globalKeyChart),
+                TransactionList(_userTransactions,
+                        (List<Transaction> localTransactions){
+                  _userTransactions = localTransactions;
+                  globalKeyChart.currentState?.updateRecentTransaction(_userTransactions);
+                  setState(() {
+
+                  });
+                }
+                )
               ],
             ),
         ),

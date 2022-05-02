@@ -3,18 +3,33 @@ import '../models/transaction.dart';
 import 'package:intl/intl.dart';
 import 'package:expenses_app/main.dart';
 
+typedef TransactionFunction = void Function(List<Transaction>);
 
-class TransactionList extends StatelessWidget {
+class TransactionList extends StatefulWidget {
 
   final List<Transaction> transactions;
+  final TransactionFunction switchToSeach;
+  TransactionList(this.transactions, this.switchToSeach);
 
-  TransactionList(this.transactions);
+  @override
+  State<TransactionList> createState() => _TransactionListState();
+}
 
+class _TransactionListState extends State<TransactionList> {
+
+  Widget stackBehindDismiss(Color clr, Icon icn) {
+    return Container(
+      alignment: Alignment.centerRight,
+      padding: EdgeInsets.only(right: 20.0),
+      color: clr,
+      child: icn,
+    );
+  }
   @override
   Widget build(BuildContext context) {
     return Container(
       height: 470,
-       child: transactions.isEmpty ? Column(children: <Widget>[
+       child: widget.transactions.isEmpty ? Column(children: <Widget>[
           Text(
               'No transactions added yet!',
           style: Theme.of(context).textTheme.headline6,
@@ -31,32 +46,46 @@ class TransactionList extends StatelessWidget {
            :ListView.builder(
             itemBuilder: (ctx, index) {
 
-              return Card(
-                elevation: 5,
-                margin: EdgeInsets.symmetric(
-                  vertical: 8,
-                  horizontal: 5,
-                ),
-                child: ListTile(
-                  leading: CircleAvatar(
-                    radius: 30,
-                    child: Padding(
-                      padding: EdgeInsets.all(5),
-                      child: FittedBox
-                        (child: Text('\$${transactions[index].amount}')),
+              return Dismissible(
+                  background: stackBehindDismiss(Colors.red, Icon(Icons.delete, color: Colors.white,)),
+                key: UniqueKey(),
+                direction: DismissDirection.endToStart,
+                onDismissed: (direction) async {
+                if (direction == DismissDirection.endToStart) {
+                widget.transactions.removeAt(index);
+                widget.switchToSeach(widget.transactions);
+                setState(() {
+
+                });
+                }
+                  },
+                child: Card(
+                  elevation: 5,
+                  margin: EdgeInsets.symmetric(
+                    vertical: 8,
+                    horizontal: 5,
+                  ),
+                  child: ListTile(
+                    leading: CircleAvatar(
+                      radius: 30,
+                      child: Padding(
+                        padding: EdgeInsets.all(5),
+                        child: FittedBox
+                          (child: Text('\$${widget.transactions[index].amount}')),
+                      ),
                     ),
-                  ),
-                  title: Text(
-                    transactions[index].title,
-                    style: Theme.of(context).textTheme.headline6,
-                  ),
-                  subtitle: Text(
-                      DateFormat.yMMMd().format(transactions[index].date)
+                    title: Text(
+                      widget.transactions[index].title,
+                      style: Theme.of(context).textTheme.headline6,
+                    ),
+                    subtitle: Text(
+                        DateFormat.yMMMd().format(widget.transactions[index].date)
+                    ),
                   ),
                 ),
               );
          },
-         itemCount: transactions.length,
+         itemCount: widget.transactions.length,
 
         ),
     );
