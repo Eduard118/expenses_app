@@ -1,7 +1,7 @@
 <manifest xmlns:android="http://schemas.android.com/apk/res/android"
-    package="com.example.expenses_app">
+    package="ro.qbs.expensesapp">
    <application
-        android:label="expenses_app"
+        android:label="expensesapp"
         android:name="${applicationName}"
         android:icon="@mipmap/ic_launcher">
         <activity

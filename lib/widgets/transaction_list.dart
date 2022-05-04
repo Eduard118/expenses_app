@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import '../models/transaction.dart';
 import 'package:intl/intl.dart';
-import 'package:expenses_app/main.dart';
+import 'package:expensesapp/main.dart';
 
 typedef TransactionFunction = void Function(List<Transaction>);
 

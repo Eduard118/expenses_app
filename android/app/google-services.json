@@ -1,0 +1,39 @@
+{
+  "project_info": {
+    "project_number": "1074037282963",
+    "project_id": "expenses-app-3d8aa",
+    "storage_bucket": "expenses-app-3d8aa.appspot.com"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:1074037282963:android:5278ec8e14fb5b6d3c9566",
+        "android_client_info": {
+          "package_name": "ro.qbs.expensesapp"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "1074037282963-31fo0lh126h247vdd4pstl36doup738a.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyBKnhXjOtRyM5LcxzU1mdyjKDQhZ5SIqdk"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": [
+            {
+              "client_id": "1074037282963-31fo0lh126h247vdd4pstl36doup738a.apps.googleusercontent.com",
+              "client_type": 3
+            }
+          ]
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}
