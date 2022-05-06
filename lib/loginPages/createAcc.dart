@@ -48,6 +48,7 @@ class _RegisterState extends State<Register> {
   Widget build(BuildContext context) {
 
     return Builder(builder: (context) => Scaffold(
+      backgroundColor: Color(0xffEBE8FC),
       appBar: AppBar(
         centerTitle: true,
         title: Padding(
@@ -81,7 +82,7 @@ class _RegisterState extends State<Register> {
         ),
       ),
       body: Padding(
-        padding: const EdgeInsets.all(10),
+        padding: const EdgeInsets.only(top: 50, bottom: 10),
         child: Form(
           key: _formKey,
           child:

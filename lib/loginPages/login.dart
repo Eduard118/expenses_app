@@ -1,10 +1,12 @@
 import 'package:expensesapp/loginPages/createAcc.dart';
 import 'package:expensesapp/screens/myHomePage.dart';
 import 'package:expensesapp/services/auth.dart';
+import 'package:expensesapp/services/globals.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_typeahead/flutter_typeahead.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
+import 'package:expensesapp/services/forgotPassword.dart';
 
 class Login extends StatefulWidget {
   const Login({Key? key}) : super(key: key);
@@ -21,8 +23,8 @@ class _LoginState extends State<Login> {
 
   String _smode = 'p';
 
-  TextEditingController _psswController = TextEditingController();
-  TextEditingController _emailController = TextEditingController();
+  TextEditingController _psswController = TextEditingController(text: "qbsr3tail");
+  TextEditingController _emailController = TextEditingController(text: "eduard@qbsretail.ro");
 
   FocusNode focusNodeEmail = new FocusNode();
   FocusNode focusNodePassword = new FocusNode();
@@ -58,6 +60,13 @@ class _LoginState extends State<Login> {
     FocusScope.of(context).unfocus();
     await Navigator.push(
         context, MaterialPageRoute(builder: (context) => Register(usEmail: _emailController.text,)));
+  }
+
+  //password reset
+  Future<void> forgotPassword(BuildContext context) async {
+    FocusScope.of(context).unfocus();
+    await Navigator.push(
+        context, MaterialPageRoute(builder: (context) => PasswordRecover(usEmail: _emailController.text,)));
   }
 
   Widget build(BuildContext context) {
@@ -137,7 +146,9 @@ class _LoginState extends State<Login> {
                                         decoration: const InputDecoration(
                                           border: OutlineInputBorder(
                                               borderRadius: BorderRadius.all(
-                                                  Radius.circular(15.0))),
+                                                  Radius.circular(15.0)
+                                              )
+                                          ),
                                           labelText: 'Email',
                                         ),
                                         onSubmitted: (value) {
@@ -254,6 +265,42 @@ class _LoginState extends State<Login> {
                           ),
                           Center(
                             child: Container(
+                              height: 30,
+                              child: Center(
+                                child: MouseRegion(
+                                  cursor: SystemMouseCursors.click,
+                                    child: Row(
+                                      mainAxisAlignment: MainAxisAlignment.center,
+                                      children: <Widget>[
+                                        Container(
+                                            child: Image.asset('assets/images/forgotPassword.png',
+                                                height: 25, width: 25, fit: BoxFit.cover)
+                                        ),
+                                        Padding(
+                                          padding: const EdgeInsets.only(left: 10),
+                                          child: InkWell(
+                                            child: Text('Forgot password?',
+                                                style: TextStyle(
+                                                    color: Theme.of(context).colorScheme.secondary,
+                                                    fontSize: 16,
+                                                    fontWeight: FontWeight.bold,
+                                                )
+                                            ),
+                                            onTap: () async{ return await forgotPassword(context);},
+
+                                          ),
+                                        ),
+                                      ],
+                                    ),
+                                ),
+                              ),
+                            ),
+                          ),
+                          Container(
+                            height: 10,
+                          ),
+                          Center(
+                            child: Container(
                               width: 170,
                               child: TextButton.icon(
                                 icon: Icon(Icons.person_add),
@@ -284,7 +331,7 @@ class _LoginState extends State<Login> {
       if(!RegExp(r"(^[a-zA-Z0-9_.+-]+@[a-zA-Z0-9-]+\.[a-zA-Z0-9-.]+$)").hasMatch(email)){
         ScaffoldMessenger.of(context).showSnackBar(
             const SnackBar(
-              content: Text("si_snack_invalidEmail"),
+              content: Text('Please enter your account'),
               backgroundColor: Colors.red,
             ));
         focusNodeEmail.requestFocus();
@@ -293,9 +340,10 @@ class _LoginState extends State<Login> {
       else {
         ScaffoldMessenger.of(context).showSnackBar(
             const SnackBar(
-              content: Text("si_snack_invalidPass"),
+              content: Text('Invalid password'),
               backgroundColor: Colors.red,
-            ));
+            )
+        );
         focusNodePassword.requestFocus();
         _psswController.value = _psswController.value.copyWith(selection: TextSelection(baseOffset: 0, extentOffset: _psswController.text.length));
       }
@@ -338,6 +386,7 @@ class _LoginState extends State<Login> {
     if(result!= null){
       if(result != false){
 
+        Globals.email = email;
         await Navigator.push(context, MaterialPageRoute(builder: (context)=>
             MyHomePage()));
       }
@@ -348,140 +397,134 @@ class _LoginState extends State<Login> {
 
     }
   }
+  /*try {
+  String scompany;
+  if (lDemo) {
+  scompany = demoDb;
+  }
+  else {
+  scompany = _companyController.text.trim();
+  if (Util.isEmpty(scompany)!) {
+  throw new CustomException(Util.mesaje(context, 'fillCompany'));
+  }
+  }
+
+  _emailController.text = _emailController.text.trim();
+  String email;
+  if (lDemo) {
+  email = demoEmail;
+  }
+  else {
+  if (Util.isEmpty(_emailController.text)!) {
+  throw new CustomException(Util.mesaje(context, 'fillEmail'));
+  }
+  email = _emailController.text;
+  }
+
+  _psswController.text = _psswController.text.trim();
+  String? pssw;
+  if (lDemo) {
+  pssw = demoPsw;
+  }
+  else if (biometricCall || autologin) {
+  pssw = _psswController.text.isEmpty ? Globals.usPssw : _psswController.text;
+  }
+  else {
+  if (_psswController.text.isEmpty) {
+  throw new CustomException(Util.mesaje(context, 'wrongPassword'));
+  }
+  pssw = _psswController.text;
+  }
+
+  setState((){
+  _smode = '*';
+  });
+
+  firebaseUser = (await FirebaseAuth.instance.signInWithEmailAndPassword(email: email, password: pssw!)).user;
+
+  if (firebaseUser!.emailVerified) {
+
+  AutentificateCU.context = context;
+  if (scompany != Globals.qSN) {
+  // societatea introdusa difera de cea din autentificarea anterioara,
+  // deci autentificare obligatorie de pe WS
+  if (!await AutentificateCU.authCompWs(
+  scompany,
+  companyOptions: _companyOptions, emailOptions: _emailOptions)) {
+  throw new CustomException(AutentificateCU.message);
+  }
+  }
+  else if (!await AutentificateCU.authCompP(scompany)) {
+  throw new CustomException(AutentificateCU.message);
+  }
+
+  if (await AutentificateCU.authUser(usEmail: email, usPssw: pssw)) {
+  if (!lDemo && !biometricCall && !autologin) {
+  // scrie parametrii cititi in fisierul de stare
+  Globals.qSN = scompany;
+  await SettingsHelpr.setString('qSN', Globals.qSN);
+  Globals.usEmail = _emailController.text;
+  await SettingsHelpr.setString('usEmail', Globals.usEmail);
+  Globals.usPssw = _psswController.text;
+  await SettingsHelpr.setString('usPssw', Pr.encode(_psswController.text));
+
+  if (_companyOptions.indexOf(Globals.qSN!) < 0) {
+  _companyOptions.add(Globals.qSN!);
+  await SettingsHelpr.setString('companyOptions', '$_companyOptions');
+  }
+
+  if (_emailOptions.indexOf(Globals.usEmail!) < 0) {
+  _emailOptions.add(Globals.usEmail!);
+  await SettingsHelpr.setString('emailOptions', '$_emailOptions');
+  }
+  }
+
+  // lanseaza modulul de start
+  await Navigator.push(
+  context,
+  MaterialPageRoute(
+  builder: (context) =>
+  Hello(message: Util.mesaje(context, 'S1Ana Assist'))
+  )
+  );
+
+  }
+  else {
+  throw new CustomException(AutentificateCU.message);
+  }
+  }
+  else {
+  throw new CustomException('${Util.mesaje(context, 'accountNotActivated')}\n\n${Util.mesaje(context, 'acctivateAccount')}');
+  }
+  }
+  catch (e, stacktrace) {
+  setState(() {
+  _smode = 'l';
+  });
+  if (e is CustomException) {
+  dispMsg(e.message, context);
+  } else if (e is PlatformException) {
+  if (e.code == 'ERROR_WRONG_PASSWORD') {
+  dispMsg(Util.mesaje(context, 'invalidPassw'), context);
+  } else if (e.code == 'ERROR_NETWORK_REQUEST_FAILED') {
+  dispMsg(Util.mesaje(context, 'noInternetConnection'), context);
+  } else {
+  dispMsg(Util.mesaje(context, 'invalidCredentials'), context);
+  }
+  } else if (e is FirebaseAuthException) {
+  if (e.code.compareTo('user-not-found') == 0) {
+  dispMsg(Util.mesaje(context, 'noUserFound'), context);
+  }
+  else if (e.code.compareTo('wrong-password') == 0) {
+  dispMsg(Util.mesaje(context, 'wrongPassword'), context);
+  }
+  else {
+  dispMsg(e.message, context);
+  }
+  }
+  }*/
 }
 
 
 
-//   bool? isEmpty (dynamic xval) {
-//     bool? retval;
-//     if (xval == null) {
-//       retval = true;
-//     }
-//     else {
-//       //String stype = xval.runtimeType.toString().toLowerCase();
-//
-//       if (xval is String) {
-//         retval = (xval.trim() == '');
-//       }
-//       else if (xval is int) {
-//         retval = (xval == 0);
-//       }
-//       else if (xval is double) {
-//         retval = (xval == 0);
-//       }
-//       else if (xval  is bool) {
-//         retval = (!xval);
-//       }
-//       else if (xval is List) {
-//         retval = (xval.isEmpty);
-//       }
-//       else if (xval is HashMap) {
-//         retval = (xval.isEmpty);
-//       }
-//     }
-//
-//     return retval;
-//   }
-//
-//   // Login FB + aplicatie
-//   Future<void> _loginFB() async {
-//
-//     FocusScope.of(context).unfocus();
-//     User? firebaseUser;
-//
-//     try {
-//       _emailController.text = _emailController.text.trim();
-//       String email;
-//         if (isEmpty(_emailController.text)!) {
-//           throw CustomException("Completeaza emailul");
-//         }
-//         email = _emailController.text;
-//
-//
-//       _psswController.text = _psswController.text.trim();
-//       String? pssw;
-//         if (_psswController.text.isEmpty) {
-//           throw new CustomException("Completeaza parola");
-//         }
-//         pssw = _psswController.text;
-//       setState((){
-//         _smode = '*';
-//       });
-//
-//       firebaseUser = (await FirebaseAuth.instance.signInWithEmailAndPassword(email: email, password: pssw!)).user;
-//
-//       if (firebaseUser!.emailVerified) {
-//
-//         AutentificateCU.context = context;
-//         if (await AutentificateCU.authUser(usEmail: email, usPssw: pssw)) {
-//           if (!lDemo && !biometricCall && !autologin) {
-//             // scrie parametrii cititi in fisierul de stare
-//             Globals.qSN = scompany;
-//             await SettingsHelpr.setString('qSN', Globals.qSN);
-//             Globals.usEmail = _emailController.text;
-//             await SettingsHelpr.setString('usEmail', Globals.usEmail);
-//             Globals.usPssw = _psswController.text;
-//             await SettingsHelpr.setString('usPssw', Pr.encode(_psswController.text));
-//
-//             if (_companyOptions.indexOf(Globals.qSN!) < 0) {
-//               _companyOptions.add(Globals.qSN!);
-//               await SettingsHelpr.setString('companyOptions', '$_companyOptions');
-//             }
-//
-//             if (_emailOptions.indexOf(Globals.usEmail!) < 0) {
-//               _emailOptions.add(Globals.usEmail!);
-//               await SettingsHelpr.setString('emailOptions', '$_emailOptions');
-//             }
-//           }
-//
-//           // lanseaza modulul de start
-//           await Navigator.push(
-//               context,
-//               MaterialPageRoute(
-//                   builder: (context) =>
-//                       Hello(message: Util.mesaje(context, 'S1Ana Assist'))
-//               )
-//           );
-//
-//         }
-//         else {
-//           throw new CustomException(AutentificateCU.message);
-//         }
-//       }
-//       else {
-//         throw new CustomException('${Util.mesaje(context, 'accountNotActivated')}\n\n${Util.mesaje(context, 'acctivateAccount')}');
-//       }
-//     }
-//     catch (e, stacktrace) {
-//       setState(() {
-//         _smode = 'l';
-//       });
-//       if (e is CustomException) {
-//         dispMsg(e.message, context);
-//       } else if (e is PlatformException) {
-//         if (e.code == 'ERROR_WRONG_PASSWORD') {
-//           dispMsg(Util.mesaje(context, 'invalidPassw'), context);
-//         } else if (e.code == 'ERROR_NETWORK_REQUEST_FAILED') {
-//           dispMsg(Util.mesaje(context, 'noInternetConnection'), context);
-//         } else {
-//           dispMsg(Util.mesaje(context, 'invalidCredentials'), context);
-//         }
-//       } else if (e is FirebaseAuthException) {
-//         if (e.code.compareTo('user-not-found') == 0) {
-//           dispMsg(Util.mesaje(context, 'noUserFound'), context);
-//         }
-//         else if (e.code.compareTo('wrong-password') == 0) {
-//           dispMsg(Util.mesaje(context, 'wrongPassword'), context);
-//         }
-//         else {
-//           dispMsg(e.message, context);
-//         }
-//       }
-//     }
-//   }
-// }
-// class CustomException implements Exception {
-//   final String? errorcode;
-//   final String? message;
-//   CustomException(this.message, {this.errorcode});
-// }
+

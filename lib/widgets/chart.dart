@@ -5,7 +5,7 @@ import 'package:intl/intl.dart';
 import 'chart_bar.dart';
 
 class Chart extends StatefulWidget {
-  List<Transaction> recentTransactions;
+  List<TransactionModel> recentTransactions;
 
   Chart(this.recentTransactions, {required Key key}) : super(key: key);
 
@@ -15,14 +15,14 @@ class Chart extends StatefulWidget {
 
 class ChartState extends State<Chart> {
 
-  late List<Transaction> recentTransactions;
+  late List<TransactionModel> recentTransactions;
 
   @override
   void initState() {
     recentTransactions = widget.recentTransactions;
   }
 
-  void updateRecentTransaction(List<Transaction> auxTrans){
+  void updateRecentTransaction(List<TransactionModel> auxTrans){
     setState((){
       recentTransactions = auxTrans;
     });

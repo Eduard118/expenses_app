@@ -1,8 +1,12 @@
 import 'dart:ui';
+import 'package:expensesapp/models/transaction.dart';
+import 'package:expensesapp/services/firebaseCRUD.dart';
 import 'package:flutter/material.dart';
 import 'dart:math' as math;
 import 'package:flutter/services.dart';
 import 'package:intl/intl.dart';
+
+import '../services/globals.dart';
 
 class NewTransaction extends StatefulWidget {
 
@@ -24,7 +28,7 @@ class _NewTransactionState extends State<NewTransaction> {
   bool dateWasSelectedFlag = false;
   DateTime? _selectedDate;
 
-  void _submitDada(){
+  void _submitData() async{
     final enteredTitle = _titleController.text;
     double enteredAmount = 0.00;
 
@@ -39,11 +43,15 @@ class _NewTransactionState extends State<NewTransaction> {
         return;
     }
 
+    TransactionModel transaction = await FirebaseCRUD.createTransaction(Globals.email, TransactionModel(title: enteredTitle, amount: enteredAmount, date: _selectedDate!, nowDate: DateTime.now()));
+
       widget.addTx(
-        enteredTitle,
-        enteredAmount,
-        _selectedDate,
+        transaction.title,
+        transaction.amount,
+        transaction.date,
+        transaction.id
       );
+
     Navigator.of(context).pop();
     ScaffoldMessenger.of(context).showSnackBar(SnackBar(
         backgroundColor: Theme.of(context).primaryColorDark,
@@ -112,7 +120,7 @@ class _NewTransactionState extends State<NewTransaction> {
               controller: _amountController,
               keyboardType: const TextInputType.numberWithOptions(decimal: true, signed: false),
 
-              onSubmitted: (_) => _submitDada(),
+              onSubmitted: (_) => _submitData(),
               onChanged: (_){
                 setState(() {
 
@@ -176,7 +184,7 @@ class _NewTransactionState extends State<NewTransaction> {
                       primary: (functieVerificareValiditate())?Theme.of(context).primaryColorDark : Theme.of(context).primaryColorLight),
                   child: Text('Add Transaction'),
 
-                  onPressed: () => _submitDada(),
+                  onPressed: () => _submitData(),
                 ),
               ],
             ),
