@@ -1,9 +1,12 @@
+import 'dart:ui';
+
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:expensesapp/models/transaction.dart';
 import 'package:expensesapp/widgets/chart.dart';
 import 'package:expensesapp/widgets/new_transaction.dart';
 import 'package:expensesapp/widgets/transaction_list.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_spinkit/flutter_spinkit.dart';
 
 import '../services/firebaseCRUD.dart';
 
@@ -55,18 +58,31 @@ class _MyHomePageState extends State<MyHomePage> {
     });
   }
 
-  void _startAddNewTransaction(BuildContext ctx) {
-    showModalBottomSheet(context: ctx, builder: (_) {
+  Future <void> _startAddNewTransaction(BuildContext ctx) async{
+    await showModalBottomSheet(context: ctx, builder: (_) {
       return NewTransaction(_addNewTransaction);
     },);
+
+    globalKeyChart.currentState?.updateRecentTransaction(_userTransactions);
+
+    setState(() {
+
+    });
   }
+
+  bool hasPassedInit = false;
   Future<bool> _getdata()async{
-    _userTransactions = [];
-    QuerySnapshot res = await FirebaseCRUD.getAllDocumentsFromCollection();
-    for(var document in res.docs){
-      TransactionModel newTx = TransactionModel.fromJson((document.data() as Map<String, dynamic>));
-      newTx.id = document.id;
-      _userTransactions.add(newTx);
+
+    if(!hasPassedInit){
+      _userTransactions = [];
+      QuerySnapshot res = await FirebaseCRUD.getAllDocumentsFromCollection();
+      for(var document in res.docs){
+        TransactionModel newTx = TransactionModel.fromJson((document.data() as Map<String, dynamic>));
+        newTx.id = document.id;
+        _userTransactions.add(newTx);
+      }
+    hasPassedInit = true;
+      await Future.delayed(Duration(milliseconds: 1000));
     }
     return true;
   }
@@ -75,15 +91,29 @@ class _MyHomePageState extends State<MyHomePage> {
     return FutureBuilder <bool>(
       future: _getdata(),
       builder: (BuildContext context, AsyncSnapshot<bool> snapshot){
+
         if(snapshot.hasData){
           return Scaffold(
             appBar: AppBar(
               //automaticallyImplyLeading: false,
-              title: const Text('Personal Expenses'),
+
+            leading: GestureDetector(
+                onTap: (){
+                  Navigator.of(context).pop();
+                },
+                child: Icon(Icons.logout)
+            ),
+              title: Text('Personal Expenses',
+              style: TextStyle(
+                  color: Theme.of(context).colorScheme.secondary,
+                fontWeight: FontWeight.bold
+              )),
               actions: <Widget>[
                 IconButton(
                   icon: const Icon(Icons.add),
-                  onPressed: () => _startAddNewTransaction(context),
+                  onPressed: () async{
+                    await _startAddNewTransaction(context);
+                  }
                 )
               ],
             ),
@@ -114,7 +144,9 @@ class _MyHomePageState extends State<MyHomePage> {
             floatingActionButtonLocation: FloatingActionButtonLocation.centerFloat,
             floatingActionButton: FloatingActionButton(
                 child: const Icon(Icons.add),
-                onPressed: () => _startAddNewTransaction(context)
+                onPressed: () async{
+                  await _startAddNewTransaction(context);
+                }
             ),
           );
         }
@@ -133,18 +165,35 @@ class _MyHomePageState extends State<MyHomePage> {
               );
         }
         else {
-          return Column(
-            children: const [
-              SizedBox(
-                width: 60,
-                height: 60,
-                child: CircularProgressIndicator(),
-              ),
-              Padding(
-                padding: EdgeInsets.only(top: 16),
-                child: Text('Awaiting result...'),
-              )
-            ],
+          return Container(
+            color: Color(0xffEBE8FC),
+            child: Center(
+                child:Column(
+                  mainAxisAlignment: MainAxisAlignment.center,
+                  crossAxisAlignment: CrossAxisAlignment.center,
+                  children: <Widget>[
+                    SpinKitChasingDots(
+                      color: Theme.of(context).colorScheme.secondary,
+                      size: 50,
+                    ),
+
+                    Padding(
+                      padding: const EdgeInsets.only(top: 10),
+                      child: Container(
+                        //color: Colors.lightBlue[100],
+                          child: Text("Loading",
+                            style: TextStyle(
+                                color: Theme.of(context).colorScheme.primary,
+                                fontSize: 16 ,
+                                decoration: TextDecoration.none,
+                                //decoration: TextDecoration.none,
+                                fontWeight: FontWeight.bold
+                            ),)
+                      ),
+                    ),
+                  ],
+                )
+            ),
           );
         }
       },

@@ -14,6 +14,8 @@ class NewTransaction extends StatefulWidget {
 
   NewTransaction(this.addTx);
 
+  get transactions => null;
+
   @override
   State<NewTransaction> createState() => _NewTransactionState();
 }
@@ -28,7 +30,7 @@ class _NewTransactionState extends State<NewTransaction> {
   bool dateWasSelectedFlag = false;
   DateTime? _selectedDate;
 
-  void _submitData() async{
+  Future<void> _submitData() async{
     final enteredTitle = _titleController.text;
     double enteredAmount = 0.00;
 
@@ -40,24 +42,33 @@ class _NewTransactionState extends State<NewTransaction> {
     if(enteredTitle.isEmpty || enteredAmount <= 0 || _selectedDate == null){
       ///Reminder: try add a Snackbar message for invalid inputs
 
-        return;
+      return;
     }
 
     TransactionModel transaction = await FirebaseCRUD.createTransaction(Globals.email, TransactionModel(title: enteredTitle, amount: enteredAmount, date: _selectedDate!, nowDate: DateTime.now()));
 
-      widget.addTx(
+    widget.addTx(
         transaction.title,
         transaction.amount,
         transaction.date,
         transaction.id
-      );
+    );
 
     Navigator.of(context).pop();
-    ScaffoldMessenger.of(context).showSnackBar(SnackBar(
-        backgroundColor: Theme.of(context).primaryColorDark,
-        duration: Duration(seconds: 3),
-         content: Text('Item added!'),
+    ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(
+      backgroundColor: Theme.of(context).primaryColorDark,
+      duration: Duration(seconds: 3),
+      content: Text('Item added!'),
+          action: SnackBarAction(
+            label: 'UNDO',
+              textColor: Theme.of(context).colorScheme.secondary,
+              onPressed: () {
+
+              }
+          ),
     ));
+
 
   }
 
@@ -115,19 +126,19 @@ class _NewTransactionState extends State<NewTransaction> {
               controller: _titleController,
             ),
             TextField(
-              decoration: InputDecoration(labelText: 'Amount'),
-              focusNode: amountFocusNode,
-              controller: _amountController,
-              keyboardType: const TextInputType.numberWithOptions(decimal: true, signed: false),
+                decoration: InputDecoration(labelText: 'Amount'),
+                focusNode: amountFocusNode,
+                controller: _amountController,
+                keyboardType: const TextInputType.numberWithOptions(decimal: true, signed: false),
 
-              onSubmitted: (_) => _submitData(),
-              onChanged: (_){
-                setState(() {
-
-                });
-              },
-              inputFormatters: [
-                FilteringTextInputFormatter.deny(RegExp("[^0-9.-]")), DecimalTextInputFormatter(decimalRange: 2)]
+                onSubmitted: (_) async{
+                  await _submitData();
+                },
+                onChanged: (_)async{
+                  await _submitData();
+                },
+                inputFormatters: [
+                  FilteringTextInputFormatter.deny(RegExp("[^0-9.-]")), DecimalTextInputFormatter(decimalRange: 2)]
             ),
             Container(
               padding: EdgeInsets.only(top: 10, bottom: 10),
@@ -155,8 +166,8 @@ class _NewTransactionState extends State<NewTransaction> {
                     style: TextStyle(
                         fontWeight: FontWeight.bold),
                   ),
-                  onPressed: () {
-                    _presentDatePicker();
+                  onPressed: () async{
+                    await _presentDatePicker();
                     setState(() {
 
                     });
@@ -184,7 +195,9 @@ class _NewTransactionState extends State<NewTransaction> {
                       primary: (functieVerificareValiditate())?Theme.of(context).primaryColorDark : Theme.of(context).primaryColorLight),
                   child: Text('Add Transaction'),
 
-                  onPressed: () => _submitData(),
+                  onPressed: () async{
+                    await _submitData();
+                  },
                 ),
               ],
             ),

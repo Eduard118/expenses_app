@@ -1,8 +1,6 @@
 import 'package:flutter/material.dart';
 import '../models/transaction.dart';
 import 'package:intl/intl.dart';
-import 'package:expensesapp/main.dart';
-
 import '../services/firebaseCRUD.dart';
 
 typedef TransactionFunction = void Function(List<TransactionModel>);

@@ -1,12 +1,14 @@
+import 'package:expensesapp/services/notification_service.dart';
 import 'package:firebase_core/firebase_core.dart';
 import 'package:flutter/material.dart';
 import 'loginPages/login.dart';
-
+import 'package:expensesapp/services/notification_service_implmnt.dart';
 
 
 Future<void> main() async {
   WidgetsFlutterBinding.ensureInitialized();
   await Firebase.initializeApp();
+  await NotificationService().init();
   runApp(MyApp());
 }
 
