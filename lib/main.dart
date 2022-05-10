@@ -1,6 +1,7 @@
 import 'package:expensesapp/services/notification_service.dart';
 import 'package:firebase_core/firebase_core.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_local_notifications/flutter_local_notifications.dart';
 import 'loginPages/login.dart';
 import 'package:expensesapp/services/notification_service_implmnt.dart';
 
@@ -8,11 +9,12 @@ import 'package:expensesapp/services/notification_service_implmnt.dart';
 Future<void> main() async {
   WidgetsFlutterBinding.ensureInitialized();
   await Firebase.initializeApp();
-  await NotificationService().init();
+  //await NotificationService().init();
   runApp(MyApp());
 }
 
 class MyApp extends StatelessWidget {
+
   @override
   Widget build(BuildContext context) {
     return MaterialApp(
@@ -45,7 +47,7 @@ class MyApp extends StatelessWidget {
             ).headline6,
           ),
       ),
-      home: const Login(),
+      home: Login(),
     );
   }
 }

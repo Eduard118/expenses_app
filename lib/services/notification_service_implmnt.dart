@@ -6,8 +6,8 @@ import 'package:flutter_local_notifications/flutter_local_notifications.dart';
 class NotificationServiceImpl extends NotificationService {
 
   Future<void> init() async {
-    final AndroidInitializationSettings initializationSettingsAndroid =
-    AndroidInitializationSettings('app_icon');
+    const AndroidInitializationSettings initializationSettingsAndroid =
+    AndroidInitializationSettings('appIcon');
 
     var onDidReceiveLocalNotification;
     final IOSInitializationSettings initializationSettingsIOS =
@@ -27,6 +27,7 @@ class NotificationServiceImpl extends NotificationService {
     var flutterLocalNotificationsPlugin;
     await flutterLocalNotificationsPlugin.initialize(initializationSettings,
         onSelectNotification: selectNotification);
+    await flutterLocalNotificationsPlugin.initialize(initializationSettings);
   }
 
 

@@ -4,11 +4,13 @@ import 'package:expensesapp/services/auth.dart';
 import 'package:expensesapp/services/globals.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_local_notifications/flutter_local_notifications.dart';
 import 'package:flutter_typeahead/flutter_typeahead.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 import 'package:expensesapp/services/forgotPassword.dart';
 
 class Login extends StatefulWidget {
+
   const Login({Key? key}) : super(key: key);
 
   @override
@@ -34,6 +36,70 @@ class _LoginState extends State<Login> {
   bool _hidePassword = true;
   bool _isKeyBoardVisible = false;
   bool _activeRemember = false;
+
+  final FlutterLocalNotificationsPlugin flutterLocalNotificationsPlugin =
+  FlutterLocalNotificationsPlugin();
+
+  String get channelName => null.toString();
+
+  String get channelId => null.toString();
+
+  Future<void> _showNotification() async {
+/*    const NotificationDetails androidPlatformChannelSpecifics =
+    NotificationDetails(
+      iOS: IOSNotificationDetails(
+        presentAlert: true,
+        presentBadge: true,
+        presentSound: true,
+      ),
+      android: AndroidNotificationDetails(
+        'channel-potential',
+        'channel-potential',
+        styleInformation: DefaultStyleInformation(
+          false,
+          false,
+        ),
+      ),
+    );*/
+    const NotificationDetails platformChannelSpecifics =
+    NotificationDetails(android: AndroidNotificationDetails(
+      'channel-potential',
+      'channel-potential',
+      styleInformation: DefaultStyleInformation(
+        false,
+        false,
+      ),
+    ),
+      iOS: IOSNotificationDetails(
+        presentAlert: true,
+        presentBadge: true,
+        presentSound: true,
+      ),
+    );
+
+
+    /*await flutterLocalNotificationsPlugin.show(
+        0, 'plain title', 'plain body', platformChannelSpecifics,
+        payload: 'item x');*/
+   await flutterLocalNotificationsPlugin.show(
+      DateTime.now().millisecond,
+      'plain title',
+      'plain body',
+      NotificationDetails(
+        android: AndroidNotificationDetails(
+          channelName,
+          channelId,
+          icon: "app_icon",
+          priority: Priority.max,
+          importance: Importance.max,
+          enableVibration: true,
+        ),
+      ),
+      payload: 'item x');
+
+
+    //final NotificationDetails _details = const
+  }
 
   MaterialColor createMaterialColor(Color color) {
     List strengths = <double>[.05];
@@ -312,6 +378,24 @@ class _LoginState extends State<Login> {
                                 //style: Util.bTxtSt(context),
                               ),
                             ),
+                             ElevatedButton(
+                               onPressed: () async {
+                                 await _showNotification();
+                               },
+                               child: Text('Send notification'),
+                               style: ButtonStyle(
+                                 shape: MaterialStateProperty.all<RoundedRectangleBorder>(
+                                     RoundedRectangleBorder(
+                                         borderRadius: BorderRadius.circular(18),
+                                         side: BorderSide(
+                                             color: Theme.of(context).colorScheme.secondary
+                                         )
+                                     )
+                                 ) ,
+                                 //style: Util.bTxtSt(context),
+                               ),
+                             )
+
                         ]
                         )
                     )

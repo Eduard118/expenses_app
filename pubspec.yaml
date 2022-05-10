@@ -30,7 +30,7 @@ dependencies:
   flutter:
     sdk: flutter
   intl: ^0.17.0
-  flutter_local_notifications: ^5.0.0+1
+  flutter_local_notifications: ^9.5.2
   firebase_core: ^1.13.1
   firebase_auth_oauth: ^1.2.0
   cloud_firestore: ^3.1.11
@@ -84,6 +84,7 @@ flutter:
     - assets/images/wallet.png
     - assets/images/newUser.png
     - assets/images/forgotPassword.png
+    - assets/images/appIcon.png
   #   - images/a_dot_ham.jpeg
 
   # An image asset can refer to one or more resolution-specific "variants", see
