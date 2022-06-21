@@ -4,6 +4,7 @@ import 'package:expensesapp/widgets/chart.dart';
 import 'package:expensesapp/widgets/new_transaction.dart';
 import 'package:expensesapp/widgets/transaction_list.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_spinkit/flutter_spinkit.dart';
 
 import '../services/firebaseCRUD.dart';
 
@@ -50,13 +51,14 @@ class _MyHomePageState extends State<MyHomePage> {
 
 
     newTx.id = id;
+    globalKeyChart.currentState!.recentTransactions = _userTransactions;
     setState(() {
       _userTransactions.add(newTx);
     });
   }
 
-  void _startAddNewTransaction(BuildContext ctx) {
-    showModalBottomSheet(context: ctx, builder: (_) {
+  Future<void> _startAddNewTransaction(BuildContext ctx) async{
+    await showModalBottomSheet(context: ctx, builder: (_) {
       return NewTransaction(_addNewTransaction);
     },);
   }
@@ -114,7 +116,12 @@ class _MyHomePageState extends State<MyHomePage> {
             floatingActionButtonLocation: FloatingActionButtonLocation.centerFloat,
             floatingActionButton: FloatingActionButton(
                 child: const Icon(Icons.add),
-                onPressed: () => _startAddNewTransaction(context)
+                onPressed: () async{
+                  await _startAddNewTransaction(context);
+                  setState((){
+
+                  });
+                }
             ),
           );
         }
@@ -133,18 +140,35 @@ class _MyHomePageState extends State<MyHomePage> {
               );
         }
         else {
-          return Column(
-            children: const [
-              SizedBox(
-                width: 60,
-                height: 60,
-                child: CircularProgressIndicator(),
-              ),
-              Padding(
-                padding: EdgeInsets.only(top: 16),
-                child: Text('Awaiting result...'),
-              )
-            ],
+          return Container(
+            color: Color(0xffEBE8FC),
+            child: Center(
+                child:Column(
+                  mainAxisAlignment: MainAxisAlignment.center,
+                  crossAxisAlignment: CrossAxisAlignment.center,
+                  children: <Widget>[
+                    SpinKitChasingDots(
+                      color: Theme.of(context).colorScheme.secondary,
+                      size: 50,
+                    ),
+
+                    Padding(
+                      padding: const EdgeInsets.only(top: 10),
+                      child: Container(
+                        //color: Colors.lightBlue[100],
+                          child: Text("Loading",
+                            style: TextStyle(
+                                color: Theme.of(context).colorScheme.primary,
+                                fontSize: 16 ,
+                                decoration: TextDecoration.none,
+                                //decoration: TextDecoration.none,
+                                fontWeight: FontWeight.bold
+                            ),)
+                      ),
+                    ),
+                  ],
+                )
+            ),
           );
         }
       },

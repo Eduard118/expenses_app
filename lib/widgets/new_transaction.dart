@@ -28,7 +28,7 @@ class _NewTransactionState extends State<NewTransaction> {
   bool dateWasSelectedFlag = false;
   DateTime? _selectedDate;
 
-  void _submitData() async{
+  Future<void> _submitData() async{
     final enteredTitle = _titleController.text;
     double enteredAmount = 0.00;
 
@@ -45,7 +45,7 @@ class _NewTransactionState extends State<NewTransaction> {
 
     TransactionModel transaction = await FirebaseCRUD.createTransaction(Globals.email, TransactionModel(title: enteredTitle, amount: enteredAmount, date: _selectedDate!, nowDate: DateTime.now()));
 
-      widget.addTx(
+      await widget.addTx(
         transaction.title,
         transaction.amount,
         transaction.date,
@@ -120,12 +120,12 @@ class _NewTransactionState extends State<NewTransaction> {
               controller: _amountController,
               keyboardType: const TextInputType.numberWithOptions(decimal: true, signed: false),
 
-              onSubmitted: (_) => _submitData(),
+            /*  onSubmitted: (_) => _submitData(),
               onChanged: (_){
                 setState(() {
 
                 });
-              },
+              },*/
               inputFormatters: [
                 FilteringTextInputFormatter.deny(RegExp("[^0-9.-]")), DecimalTextInputFormatter(decimalRange: 2)]
             ),

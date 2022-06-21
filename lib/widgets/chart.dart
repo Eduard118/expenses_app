@@ -1,3 +1,5 @@
+import 'dart:async';
+
 import 'package:expensesapp/models/transaction.dart';
 import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
@@ -17,14 +19,31 @@ class ChartState extends State<Chart> {
 
   late List<TransactionModel> recentTransactions;
 
+  late Timer t;
   @override
   void initState() {
     recentTransactions = widget.recentTransactions;
+
+    t = Timer.periodic(Duration(seconds: 1), (timer) {
+      callSetState();
+    });
+  }
+
+
+  @override
+  void dispose(){
+    super.dispose();
+    t.cancel();
   }
 
   void updateRecentTransaction(List<TransactionModel> auxTrans){
     setState((){
       recentTransactions = auxTrans;
+    });
+  }
+  void callSetState(){
+    setState((){
+      print(recentTransactions.length.toString());
     });
   }
 
@@ -70,9 +89,9 @@ class ChartState extends State<Chart> {
           mainAxisAlignment: MainAxisAlignment.spaceAround,
           children: groupedTrnsactionValues.map((data){
              double spendingPctOfTotal = 0.00;
-             if(totalSpending != 0.00){
-               spendingPctOfTotal = data['amount'] / totalSpending;
-             }
+               if(totalSpending != 0.00){
+                 spendingPctOfTotal = data['amount'] / totalSpending;
+               }
             //return  Container(
              // width: 25,
                // height: 100,
