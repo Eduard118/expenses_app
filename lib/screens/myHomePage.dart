@@ -21,16 +21,7 @@ class _MyHomePageState extends State<MyHomePage> {
 
   GlobalKey<ChartState> globalKeyChart = GlobalKey<ChartState>();
 
-  List<TransactionModel> _userTransactions = [
-    /*Transaction(
-        id: 't1', title: 'New Shoes', amount: 69.99, date: DateTime.now()),
-    Transaction(
-      id: 't2',
-      title: 'Groceries',
-      amount: 16.75,
-      date: DateTime.now(),
-    ),*/
-  ];
+  List<TransactionModel> _userTransactions = [];
 
   List<TransactionModel>? get _recentTransations {
     return _userTransactions.where((tx) {
@@ -51,7 +42,6 @@ class _MyHomePageState extends State<MyHomePage> {
       nowDate: DateTime.now(),
     );
 
-
     newTx.id = id;
     setState(() {
       _userTransactions.add(newTx);
@@ -60,13 +50,11 @@ class _MyHomePageState extends State<MyHomePage> {
 
   Future <void> _startAddNewTransaction(BuildContext ctx) async{
     await showModalBottomSheet(context: ctx, builder: (_) {
-      return NewTransaction(_addNewTransaction);
+      return
+        NewTransaction(_addNewTransaction);
     },);
-
-    globalKeyChart.currentState?.updateRecentTransaction(_userTransactions);
-
     setState(() {
-
+      globalKeyChart.currentState?.updateRecentTransaction(_userTransactions);
     });
   }
 
@@ -109,12 +97,12 @@ class _MyHomePageState extends State<MyHomePage> {
                 fontWeight: FontWeight.bold
               )),
               actions: <Widget>[
-                IconButton(
+                /*IconButton(
                   icon: const Icon(Icons.add),
                   onPressed: () async{
                     await _startAddNewTransaction(context);
                   }
-                )
+                )*/
               ],
             ),
             body: SingleChildScrollView(
@@ -126,14 +114,16 @@ class _MyHomePageState extends State<MyHomePage> {
                   //mainAxisAlignment: MainAxisAlignment.start,
                   crossAxisAlignment: CrossAxisAlignment.stretch,
                   children: <Widget>[
-                    Chart(_userTransactions, key: globalKeyChart),
+                    Chart(
+                        _userTransactions,
+                        key: globalKeyChart
+                    ),
                     TransactionList(_userTransactions,
                             (List<TransactionModel> localTransactions) {
-                          _userTransactions = localTransactions;
-                          globalKeyChart.currentState?.updateRecentTransaction(
-                              _userTransactions);
                           setState(() {
-
+                            _userTransactions = localTransactions;
+                            globalKeyChart.currentState?.updateRecentTransaction(
+                                _userTransactions);
                           });
                         }
                     )
@@ -145,7 +135,11 @@ class _MyHomePageState extends State<MyHomePage> {
             floatingActionButton: FloatingActionButton(
                 child: const Icon(Icons.add),
                 onPressed: () async{
+
                   await _startAddNewTransaction(context);
+
+                  setState((){
+                  });
                 }
             ),
           );

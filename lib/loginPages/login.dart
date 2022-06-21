@@ -25,8 +25,8 @@ class _LoginState extends State<Login> {
 
   String _smode = 'p';
 
-  TextEditingController _psswController = TextEditingController(text: "qbsr3tail");
-  TextEditingController _emailController = TextEditingController(text: "eduard@qbsretail.ro");
+  TextEditingController _psswController = TextEditingController(/*text: "qbsr3tail"*/);
+  TextEditingController _emailController = TextEditingController(/*text: "eduard@qbsretail.ro"*/);
 
   FocusNode focusNodeEmail = new FocusNode();
   FocusNode focusNodePassword = new FocusNode();

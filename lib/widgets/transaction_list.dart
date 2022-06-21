@@ -50,19 +50,18 @@ class _TransactionListState extends State<TransactionList> {
             background: stackBehindDismiss(Colors.red, Icon(Icons.delete, color: Colors.white,)),
             key: UniqueKey(),
             direction: DismissDirection.endToStart,
-            onDismissed: (direction) async {
-              if (direction == DismissDirection.endToStart) {
-                await FirebaseCRUD.deleteTransaction(widget.transactions[index].id);
-                widget.transactions.removeAt(index);
-                widget.switchToSeach(widget.transactions);
-                setState(() {
-
-                });
-              }
+            onDismissed: (direction){
+              setState((){
+                if (direction == DismissDirection.endToStart) {
+                  FirebaseCRUD.deleteTransaction(widget.transactions[index].id);
+                  widget.transactions.removeAt(index);
+                  widget.switchToSeach(widget.transactions);
+                }
+              });
             },
             child: Card(
               elevation: 5,
-              margin: EdgeInsets.symmetric(
+              margin: const EdgeInsets.symmetric(
                 vertical: 8,
                 horizontal: 5,
               ),
@@ -87,7 +86,6 @@ class _TransactionListState extends State<TransactionList> {
           );
         },
         itemCount: widget.transactions.length,
-
       ),
     );
 

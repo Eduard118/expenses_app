@@ -1,6 +1,7 @@
 import 'dart:ui';
 import 'package:expensesapp/models/transaction.dart';
 import 'package:expensesapp/services/firebaseCRUD.dart';
+import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'dart:math' as math;
 import 'package:flutter/services.dart';
@@ -37,22 +38,30 @@ class _NewTransactionState extends State<NewTransaction> {
     try{
       enteredAmount = double.parse(_amountController.text);
     }catch(_){
-
+      if (kDebugMode) {
+        print(_.toString());
+      }
     }
     if(enteredTitle.isEmpty || enteredAmount <= 0 || _selectedDate == null){
-      ///Reminder: try add a Snackbar message for invalid inputs
-
       return;
     }
 
-    TransactionModel transaction = await FirebaseCRUD.createTransaction(Globals.email, TransactionModel(title: enteredTitle, amount: enteredAmount, date: _selectedDate!, nowDate: DateTime.now()));
+    try{
+      TransactionModel transaction = await FirebaseCRUD.createTransaction(Globals.email,
+          TransactionModel(title: enteredTitle, amount: enteredAmount, date: _selectedDate!, nowDate: DateTime.now()));
 
-    widget.addTx(
-        transaction.title,
-        transaction.amount,
-        transaction.date,
-        transaction.id
-    );
+      await widget.addTx(
+          transaction.title,
+          transaction.amount,
+          transaction.date,
+          transaction.id
+      );
+    }catch(_){
+      if (kDebugMode) {
+        print(_.toString());
+      }
+    }
+
 
     Navigator.of(context).pop();
     ScaffoldMessenger.of(context).showSnackBar(
@@ -131,26 +140,26 @@ class _NewTransactionState extends State<NewTransaction> {
                 controller: _amountController,
                 keyboardType: const TextInputType.numberWithOptions(decimal: true, signed: false),
 
-                onSubmitted: (_) async{
+               /* onSubmitted: (_) async{
                   await _submitData();
-                },
-                onChanged: (_)async{
+                },*/
+              /*  onChanged: (_)async{
                   await _submitData();
-                },
+                },*/
                 inputFormatters: [
                   FilteringTextInputFormatter.deny(RegExp("[^0-9.-]")), DecimalTextInputFormatter(decimalRange: 2)]
             ),
             Container(
-              padding: EdgeInsets.only(top: 10, bottom: 10),
+              padding: const EdgeInsets.only(top: 10, bottom: 10),
 
               child: Row(
                 children: <Widget>[
                   Padding(
-                    padding: EdgeInsets.fromLTRB(0, 10, 0, 5),
+                    padding: const EdgeInsets.fromLTRB(0, 10, 0, 5),
                     child: Text(_selectedDate == null
                         ? 'No date chosen!'
                         : 'Picked date: ${DateFormat("dd MMM yyyy").format(_selectedDate!)}',
-                      style: TextStyle(
+                      style: const TextStyle(
                         fontWeight: FontWeight.bold,
                         color: Colors.grey,
                       ),
@@ -186,17 +195,17 @@ class _NewTransactionState extends State<NewTransaction> {
                   },
                 ),
                 const Expanded(child: SizedBox(
-
                 ),
-
                 ),
                 ElevatedButton(
                   style: ElevatedButton.styleFrom(
                       primary: (functieVerificareValiditate())?Theme.of(context).primaryColorDark : Theme.of(context).primaryColorLight),
                   child: Text('Add Transaction'),
-
                   onPressed: () async{
                     await _submitData();
+                       setState(() {
+
+                    });
                   },
                 ),
               ],
